@@ -26,7 +26,7 @@ class RoleController extends Controller
         return response()->json(['message' => 'Role created successfully'], Response::HTTP_CREATED);
     }
 
-    /**
+     /**
      * Display the specified resource.
      */
     public function show(string $id)
