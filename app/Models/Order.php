@@ -33,7 +33,9 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
+        'first_name',
+        'last_name',
+        'email',
     ];
     public function order_items():  \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -51,7 +53,7 @@ class Order extends Model
     }
     public function getNameAttribute(): string
     {
-        return $this->first_name . $this->last_name;
+        return trim("{$this->first_name} {$this->last_name}");
     }
 
 }

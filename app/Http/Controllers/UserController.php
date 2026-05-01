@@ -11,6 +11,7 @@ use App\Models\User;
 // Importing response/request helpers from Laravel
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 // UserController handles CRUD and profile-related actions for users
 class UserController extends Controller
@@ -55,7 +56,7 @@ class UserController extends Controller
         $data = $request->only(['f_name', 'l_name', 'email','role_id']);
 
         // Hash password before saving (security!)
-        $data['password'] = bcrypt($request->input('password'));
+        $data['password'] = Hash::make($request->input('password'));
 
         // Create new user in DB
         $user = User::create($data);
@@ -83,7 +84,7 @@ class UserController extends Controller
 
         // If password field is present → hash it and include
         if ($request->filled('password')) {
-            $data['password'] = bcrypt($request->input('password'));
+            $data['password'] = Hash::make($request->input('password'));
         }
 
         // Update user in DB
@@ -149,16 +150,23 @@ class UserController extends Controller
      */
     public function updatePassword(Request $request): JsonResponse
     {
+        // Validate the new password
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
         // Get currently authenticated user
         $user = auth()->user();
 
         // Hash the new password
-        $data['password'] = bcrypt($request->input('password'));
-
-        // Update DB record
-        $user->update($data);
+        $user->update([
+            'password' => Hash::make($request->input('password')),
+        ]);
 
         // Return success message
-        return response()->json(new UserResources($user),['message' => 'Password updated successfully'], 202);
+        return response()->json([
+            'message' => 'Password updated successfully',
+            'user'    => new UserResources($user),
+        ], 202);
     }
 }

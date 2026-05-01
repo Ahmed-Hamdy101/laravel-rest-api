@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductCreateRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
-use Str;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
@@ -36,14 +35,19 @@ class ProductController extends Controller
     }
 
 
-    public function update(Request $request, string $id)
+    public function update(ProductCreateRequest $request, string $id)
     {
-   }
+        $product = Product::findOrFail($id);
+        $product->update($request->only('title', 'description', 'image', 'price'));
+        return new ProductResource($product);
+    }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-   }
+        Product::findOrFail($id)->delete();
+        return response()->json(['message' => 'Product deleted successfully'], Response::HTTP_OK);
+    }
 }

@@ -27,11 +27,11 @@ class OrderController extends Controller
     {
         // header
         $headers = [
-            "Content-type" => "text/cv",
-            "Content-Disposition" => "attachment; filename=orders.cv",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0",
+            "Content-Type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=orders.csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0",
         ];
         // callback
         $callback = function () {

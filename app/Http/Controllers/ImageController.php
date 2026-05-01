@@ -3,26 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImageUploadRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class ImageController extends Controller
 {
-    public function upload(ImageUploadRequest $request): \Illuminate\Http\JsonResponse
+    public function upload(ImageUploadRequest $request): JsonResponse
     {
-        $file = $request->file('image');
-        $filename = Str::random(10) . '.' . $file->extension();
+        $path = $request->file('image')->store('images', 'public');
+        $url  = Storage::disk('public')->url($path);
 
-        $destination = public_path('images');
-        if (!file_exists($destination)) {
-            mkdir($destination, 0777, true);
-        }
-        $file->move($destination, $filename);
-        $url = env('APP_URL') . '/images/' . $filename;
         return response()->json([
-            'filename' => $filename,
-            'url' => $url,
+            'filename' => basename($path),
+            'url'      => $url,
         ], Response::HTTP_CREATED);
     }
 }
