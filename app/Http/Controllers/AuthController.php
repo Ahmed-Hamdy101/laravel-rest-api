@@ -4,49 +4,63 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
-    // base case for auth
-        if (Auth::attempt($request->only('email','password'))){
-            $user = Auth::user();
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $user  = Auth::user()->load('role');
             $token = $user->createToken('admin')->accessToken;
-            return response()->json(['token'=>$token,
-                'user'=>[
-                    'id'=>$user->id,
-                    'full name'=>$user->f_name . $user->l_name,
-                    'email'=>$user->email
-                ]]);
+
+            return response()->json([
+                'token' => $token,
+                'user'  => [
+                    'id'        => $user->id,
+                    'full_name' => trim("{$user->f_name} {$user->l_name}"),
+                    'email'     => $user->email,
+                    'role'      => $user->role?->name,
+                ],
+            ]);
         }
-        return response()->json(['error'=>'invalid Credential'],Response::HTTP_UNAUTHORIZED);
+
+        return response()->json(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
     }
 
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        // validate request is done in RegisterRequest
-        $data = $request->only(['f_name', 'l_name', 'email']);
-        // hash password
-        $data['password'] = bcrypt($request->input('password'));
-        // create user
-        $user = User::create($data);
+        $data             = $request->only(['f_name', 'l_name', 'email']);
+        $data['password'] = Hash::make($request->input('password'));
 
-        // generate token right away
+        $user  = User::create($data);
         $token = $user->createToken('admin')->accessToken;
-        // return response
+
         return response()->json([
             'message' => 'User created successfully',
             'token'   => $token,
             'user'    => [
                 'id'        => $user->id,
-                'full_name' => $user->f_name . ' ' . $user->l_name,
+                'full_name' => trim("{$user->f_name} {$user->l_name}"),
                 'email'     => $user->email,
+                'role'      => $user->role?->name,
             ],
         ], Response::HTTP_CREATED);
     }
 
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->token()->revoke();
+
+        return response()->json(['message' => 'Logged out successfully']);
+    }
 }

@@ -11,8 +11,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        // list order with pagination
-        $order = Order::paginate(10);
+        $order = Order::with('order_items')->paginate(10);
         return OrderResource::collection($order);
     }
 

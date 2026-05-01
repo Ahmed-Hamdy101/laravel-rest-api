@@ -22,8 +22,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        $user =User::paginate(10);
-        // Return 10 users per page in JSON format
+        $user = User::with('role')->paginate(10);
         return response()->json(UserResources::collection($user), 200);
     }
 

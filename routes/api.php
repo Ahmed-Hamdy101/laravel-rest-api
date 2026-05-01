@@ -8,27 +8,45 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Auth Routes (Public)
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+/*
+|--------------------------------------------------------------------------
+| API Routes — v1
+|--------------------------------------------------------------------------
+*/
 
-// Protected Routes
-Route::middleware('auth:api')->group(function () {
+Route::prefix('v1')->group(function () {
 
-    // User Profile
-    Route::prefix('user')->group(function () {
-        Route::get('user', [UserController::class, 'user']);
-        Route::put('users/info', [UserController::class, 'updateInfo']);
-        Route::put('users/password', [UserController::class, 'updatePassword']);
+    // ─── Public ───────────────────────────────────────────────────────────
+    Route::post('login',    [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+
+    // ─── Authenticated ────────────────────────────────────────────────────
+    Route::middleware('auth:api')->group(function () {
+
+        // Logout
+        Route::post('logout', [AuthController::class, 'logout']);
+
+        // Current user profile
+        Route::prefix('profile')->group(function () {
+            Route::get('/',          [UserController::class, 'user']);
+            Route::put('/info',      [UserController::class, 'updateInfo']);
+            Route::put('/password',  [UserController::class, 'updatePassword']);
+        });
+
+        // ─── Admin only ───────────────────────────────────────────────────
+        Route::middleware('role:admin')->group(function () {
+            Route::apiResource('users', UserController::class);
+            Route::apiResource('roles', RoleController::class);
+        });
+
+        // ─── Admin + editor ───────────────────────────────────────────────
+        Route::middleware('role:admin,editor')->group(function () {
+            Route::apiResource('products', ProductController::class);
+            Route::post('uploads', [ImageController::class, 'upload']);
+        });
+
+        // ─── Any authenticated user ───────────────────────────────────────
+        Route::apiResource('orders', OrderController::class)->only(['index', 'show']);
+        Route::get('orders/export', [OrderController::class, 'export']);
     });
-
-    // Admin Management
-    Route::apiResource('users', UserController::class);
-    Route::apiResource('roles', RoleController::class);
-
-    // Product Management
-    Route::apiResource('products', ProductController::class);
-    Route::apiResource('orders', OrderController::class)->only(['index','show']);
-    Route::post('uploads', [ImageController::class, 'upload']);
-    Route::get('export', [OrderController::class, 'export']);
 });
