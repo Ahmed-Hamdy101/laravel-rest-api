@@ -1,103 +1,165 @@
-# Admin API
+# admin-api-laravel
 
-This is the Admin API for managing users, roles, and permissions in the system. It provides endpoints for creating, updating, deleting, and retrieving user information, as well as managing roles and permissions.
+A production-ready **Laravel REST API** for admin dashboard backends, featuring role-based access control, Passport authentication, product/order management, and CSV export.
 
-## Base URL
+[![Laravel](https://img.shields.io/badge/Laravel-10.x-FF2D20?logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php)](https://php.net)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://docker.com)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-The base URL for the Admin API is:## Authentication
+---
 
-The Admin API uses token-based authentication. You must include an `Authorization` header with a valid token in each request WITH GET METHOD.
-- **Header:** `Authorization: Bearer {token}`
-```api
-https://localhost:8000/api
+## Features
+
+- **JWT authentication** via Laravel Passport
+- **Role-based access control** — `admin`, `editor` roles with `CheckRole` middleware
+- **User management** — CRUD, profile update, password change
+- **Product management** — full CRUD with image upload via Laravel Storage
+- **Order management** — list, show, CSV export with streaming cursor
+- **Permissions system** — Role ↔ Permission many-to-many relationship
+- **API versioning** — all routes under `/api/v1`
+- **Input validation** — FormRequest classes for every endpoint
+- **API Resources** — controlled serialization, no raw model leaking
+
+---
+
+## Architecture
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── AuthController.php      # login, register, logout
+│   │   ├── UserController.php      # user CRUD + profile
+│   │   ├── ProductController.php   # product CRUD
+│   │   ├── OrderController.php     # order list, show, CSV export
+│   │   ├── RoleController.php      # role CRUD
+│   │   └── ImageController.php     # image upload → Laravel Storage
+│   ├── Middleware/
+│   │   └── CheckRole.php           # role:admin,editor gate
+│   ├── Requests/                   # FormRequest validation classes
+│   └── Resources/                  # API response transformers
+├── Models/
+│   ├── User.php         # HasApiTokens, role(), hasPermission()
+│   ├── Role.php         # permissions() BelongsToMany
+│   ├── Permission.php
+│   ├── Product.php
+│   └── Order.php        # order_items(), getNameAttribute()
+routes/
+└── api.php              # versioned under /api/v1
 ```
 
-## Endpoints
+### Design decisions
 
-### Users
+- **Passport over Sanctum** — chosen for full OAuth2 support and access token revocation on logout
+- **FormRequest classes** — validation separated from controllers, reusable and testable
+- **API Resources** — explicit field allowlisting prevents accidentally leaking sensitive model attributes (e.g. password hash, full role object)
+- **`cursor()` for CSV export** — streams orders one at a time instead of loading all into memory, safe for large datasets
+- **CheckRole middleware** — role names are checked at the route level, not scattered across controller methods
+- **Storage::disk('public')** — images stored via Laravel's filesystem abstraction, not directly in `public/` with `0777` permissions
 
-#### Get All Users
-- **URL:** `/users`
-- **Method:** `GET`
-- **Description:** Retrieve a paginated list of users.
-- **Authentication:** Required.
+---
 
-#### Get User by ID
-- **URL:** `/users/{id}`
-- **Method:** `GET`
-- **Description:** Retrieve a single user by their ID.
-- **Authentication:** Required.
+## Getting started
 
-#### Create User
-- **URL:** `/users`
-- **Method:** `POST`
-- **Description:** Create a new user.
-- **Authentication:** Required.
-- **Body Parameters:**
-  - `f_name` (string, required): First name of the user.
-  - `l_name` (string, required): Last name of the user.
-  - `email` (string, required): Email address of the user.
-  - `password` (string, required): Password for the user.
-  - `role_id` (integer, required): Role ID for the user.
+### Prerequisites
 
-#### Update User
-- **URL:** `/users/{id}`
-- **Method:** `PUT`
-- **Description:** Update an existing user by their ID.
-- **Authentication:** Required.
-- **Body Parameters:**
-  - `f_name` (string, optional): First name of the user.
-  - `l_name` (string, optional): Last name of the user.
-  - `email` (string, optional): Email address of the user.
-  - `password` (string, optional): Password for the user.
-  - `role_id` (integer, optional): Role ID for the user.
+- PHP 8.2+
+- Composer
+- MySQL 8.0+
+- Docker (optional)
 
-#### Delete User
-- **URL:** `/users/{id}`
-- **Method:** `DELETE`
-- **Description:** Delete a user by their ID.
-- **Authentication:** Required.
+### Installation
 
-#### Get Authenticated User
-- **URL:** `/user`
-- **Method:** `GET`
-- **Description:** Retrieve the currently authenticated user.
-- **Authentication:** Required.
+```bash
+git clone https://github.com/Ahmed-Hamdy101/admin-api-laravel.git
+cd admin-api-laravel
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan passport:install
+php artisan storage:link
+```
 
-#### Update Authenticated User Info
-- **URL:** `/user/info`
-- **Method:** `PUT`
-- **Description:** Update the profile information of the currently authenticated user.
-- **Authentication:** Required.
-- **Body Parameters:**
-  - `f_name` (string, optional): First name of the user.
-  - `l_name` (string, optional): Last name of the user.
-  - `email` (string, optional): Email address of the user.
+### Development
 
-#### Update Authenticated User Password
-- **URL:** `/user/password`
-- **Method:** `PUT`
-- **Description:** Update the password of the currently authenticated user.
-- **Authentication:** Required.
-- **Body Parameters:**
-  - `password` (string, required): New password for the user.
+```bash
+php artisan serve
+# API at http://localhost:8000/api/v1
+```
 
-## Roles and Permissions
+### Docker
 
-Endpoints for managing roles and permissions can be added here.
+```bash
+docker compose up --build
+# API at http://localhost:8000/api/v1
+```
 
-## Error Handling
+---
 
-The API returns standard HTTP status codes to indicate the success or failure of a request. Common status codes include:
+## API Reference
 
-- `200 OK`: The request was successful.
-- `201 Created`: A new resource was successfully created.
-- `202 Accepted`: The request was accepted and processed.
-- `400 Bad Request`: The request was invalid or cannot be processed.
-- `401 Unauthorized`: Authentication failed or token is missing.
-- `404 Not Found`: The requested resource was not found.
-- `500 Internal Server Error`: An error occurred on the server.
+### Authentication
 
-## License
+Protected routes require a Bearer token:
+```
+Authorization: Bearer <token>
+```
 
-This project is licensed under the [MIT License](LICENSE).
+### Endpoints
+
+| Method | Endpoint | Auth | Role | Description |
+|--------|----------|------|------|-------------|
+| POST | `/api/v1/login` | — | — | Login, returns token |
+| POST | `/api/v1/register` | — | — | Register new user |
+| POST | `/api/v1/logout` | ✅ | — | Revoke current token |
+| GET | `/api/v1/profile` | ✅ | — | Get own profile |
+| PUT | `/api/v1/profile/info` | ✅ | — | Update name/email |
+| PUT | `/api/v1/profile/password` | ✅ | — | Change password |
+| GET/POST/PUT/DELETE | `/api/v1/users` | ✅ | admin | User CRUD |
+| GET/POST/PUT/DELETE | `/api/v1/roles` | ✅ | admin | Role CRUD |
+| GET/POST/PUT/DELETE | `/api/v1/products` | ✅ | admin, editor | Product CRUD |
+| POST | `/api/v1/uploads` | ✅ | admin, editor | Upload image |
+| GET | `/api/v1/orders` | ✅ | — | List orders (paginated) |
+| GET | `/api/v1/orders/{id}` | ✅ | — | Get order detail |
+| GET | `/api/v1/orders/export` | ✅ | — | Download orders CSV |
+
+### Example: Login
+
+```bash
+curl -X POST http://localhost:8000/api/v1/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password"}'
+```
+
+```json
+{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...",
+  "user": {
+    "id": 1,
+    "full_name": "Ahmed Hamdy",
+    "email": "admin@example.com",
+    "role": "admin"
+  }
+}
+```
+
+---
+
+## Environment variables
+
+| Variable | Description |
+|---|---|
+| `APP_KEY` | Laravel application key |
+| `DB_HOST` | MySQL host |
+| `DB_DATABASE` | Database name |
+| `DB_USERNAME` | Database user |
+| `DB_PASSWORD` | Database password |
+| `APP_URL` | Application URL (used for storage links) |
+
+---
+
+## Author
+
+**Ahmed Hamdy** — [GitHub](https://github.com/Ahmed-Hamdy101) · [LinkedIn](https://www.linkedin.com/in/ahmed-hamdy-AH)
