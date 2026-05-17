@@ -21,7 +21,7 @@ services:
       DB_HOST: db
       DB_DATABASE: admin
       DB_USERNAME: root
-      DB_PASSWORD: root
+      DB_PASSWORD: Admin@1234
     ports:
       - "8000:8000"
     volumes:
