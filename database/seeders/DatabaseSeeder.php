@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,10 +12,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // 1. Core independent tables first
+            PermissionSeeder::class, // <-- Must be first!
+            RoleSeeder::class,       // <-- Can now safely look up and bind permissions
+            
+            // 2. Data dependencies next
+            userSeeder::class,       // <-- Assigns roles to users
             ProductSeeder::class,
-            RoleSeeder::class,
-            userSeeder::class,
             OrderSeeder::class,
         ]);
     }
-    }
+}
