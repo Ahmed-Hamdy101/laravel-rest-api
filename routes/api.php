@@ -34,13 +34,13 @@ Route::prefix('v1')->group(function () {
         });
 
         // ─── Admin only ───────────────────────────────────────────────────
-        Route::middleware('role:admin')->group(function () {
+        Route::middleware('role:Admin')->group(function () {
             Route::apiResource('users', UserController::class);
             Route::apiResource('roles', RoleController::class);
         });
 
         // ─── Admin + editor ───────────────────────────────────────────────
-        Route::middleware('role:admin,editor')->group(function () {
+        Route::middleware('role:Admin,Editor')->group(function () {
             Route::apiResource('products', ProductController::class);
             Route::post('uploads', [ImageController::class, 'upload']);
         });
