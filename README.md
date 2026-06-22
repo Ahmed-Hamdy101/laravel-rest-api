@@ -1,4 +1,6 @@
-# admin-api-laravel
+
+## ⭐ Star this repo if you find it useful!
+# Laravel Rest API
 
 A production-ready **Laravel REST API** for admin dashboard backends, featuring role-based access control, Passport authentication, product/order management, and CSV export.
 
@@ -163,3 +165,7 @@ curl -X POST http://localhost:8000/api/v1/login \
 ## Author
 
 **Ahmed Hamdy** — [GitHub](https://github.com/Ahmed-Hamdy101) · [LinkedIn](https://www.linkedin.com/in/ahmed-hamdy-AH)
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
