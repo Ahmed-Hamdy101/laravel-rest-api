@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\RoleResources;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,8 +14,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $role = Role::all()->pluck('name');
-        return response()->json($role);
+        return RoleResources::collection(Role::all());
     }
 
     /**
@@ -22,8 +22,17 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        Role::create($request->only('name'));
-        return response()->json(['message' => 'Role created successfully'], Response::HTTP_CREATED);
+        $role = Role::create($request->only('name'));
+        if($permissions = $request->input('permissions')){
+            foreach($permissions as $permission_id){
+                \DB::table('role_permissions')->insert([
+                    'role_id'=>$role->id,
+                    'permission_id'=>$permission_id
+                ]);
+            }
+        }
+        
+        return response()->json(new RoleResources($role), Response::HTTP_CREATED);
     }
 
      /**
@@ -31,7 +40,7 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        return Role::findOrFail($id);
+        return new RoleResources(Role::findOrFail($id));
     }
 
     /**
@@ -39,18 +48,32 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // find the role
         $role = Role::findOrFail($id);
+        // update role name
         $role->update($request->only('name'));
-        return response()->json(['message' => 'Role updated successfully'], Response::HTTP_OK);
+        // delete existing permissions for the role
+        \DB::table('role_permissions')->where('role_id',$role->id)->delete(); 
+        // assign new permissions to the role
+        if($permissions = $request->input('permissions')){
+            foreach($permissions as $permission_id){
+                \Db::table('role_permissions')->insert([
+                    'role_id'=>$role->id,
+                    'permission_id'=>$permission_id
+                ]);
+            }
+        }
+        return response()->json(new RoleResources($role), Response::HTTP_OK);
     }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
-        $role = Role::findOrFail($id);
-        $role->delete();
+
+    {  
+        \DB::table('role_permissions')->where('role_id',$id)->delete(); 
+        Role::destroy($id); 
         return response()->json(['message' => 'Role deleted successfully'], Response::HTTP_OK);
     }
 }
