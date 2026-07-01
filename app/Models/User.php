@@ -56,13 +56,16 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    // role relationship
     public function role(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
-    public function hasPermission(string $permission): bool
+    // permission check 
+    public function permissions()
     {
-        return $this->role?->permissions->pluck('name')->contains($permission) ?? false;
-    }
+        return $this->role?->permissions->pluck('name');
+    } 
+
 }
