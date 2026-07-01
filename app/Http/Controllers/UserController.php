@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\UserResource;
 
 // UserController handles CRUD and profile-related actions for users
 class UserController extends Controller
@@ -115,15 +116,21 @@ class UserController extends Controller
     }
 
     /**
-     * Get the currently authenticated user.
      * Example: GET /api/user (with token)
      */
-    public function user(): JsonResponse
-    {
-        // auth()->user() returns the logged-in user
-        return response()->json(new UserResources(auth()->user()), 200);
-    }
-
+     // Change JsonResponse to object, or remove the type hint entirely
+        public function user(): JsonResponse
+            {
+                $user = \Auth::user();
+                
+                // FIXED: Changed 'data' to 'meta' to stop JSON key overwriting conflicts,
+                // and chained ->response() so it strictly honors the JsonResponse return type.
+                return (new UserResources($user))->additional([
+                    'meta' => [
+                        'permissions' => $user->permissions()
+                    ]
+                ])->response();
+            }
     /**
      * Update logged-in user’s profile info.
      * Example: PUT /api/user/info
