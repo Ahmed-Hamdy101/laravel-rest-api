@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,5 +49,8 @@ Route::prefix('v1')->group(function () {
         // ─── Any authenticated user ───────────────────────────────────────
         Route::apiResource('orders', OrderController::class)->only(['index', 'show']);
         Route::get('orders/export', [OrderController::class, 'export']);
+
+        // __ Permissions 
+        Route::get('permissions',[PermissionController::class, 'index']);
     });
 });
