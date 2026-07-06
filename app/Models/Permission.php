@@ -18,4 +18,10 @@ use Illuminate\Database\Eloquent\Model;
 class Permission extends Model
 {
     use HasFactory;
+    // tell laravel that this model does not have timestamps 
+    // public $timestamps = false;
+    // define the fillable fields for mass assignment
+    protected $fillable = [
+        'name',
+    ];
 }
