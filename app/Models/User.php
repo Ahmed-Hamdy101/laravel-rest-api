@@ -65,7 +65,8 @@ class User extends Authenticatable
     // permission check 
     public function permissions()
     {
-        return $this->role?->permissions->pluck('name');
+        return $this->role?->permissions->pluck('name')->toArray() ?? [];
     } 
 
+    // In User.php
 }

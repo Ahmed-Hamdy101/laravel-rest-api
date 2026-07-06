@@ -27,7 +27,7 @@ class Role extends Model
     public $timestamps = false;
     
     // Define the many-to-many relationship with Permission 
-    public function permissions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'role_permissions');
     }
