@@ -52,5 +52,6 @@ Route::prefix('v1')->group(function () {
 
         // __ Permissions 
         Route::get('permissions',[PermissionController::class, 'index']);
+        Route::post('permissions',[PermissionController::class, 'store']);
     });
 });
