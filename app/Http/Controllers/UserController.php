@@ -138,7 +138,7 @@ class UserController extends Controller
     public function updateInfo(Request $request): JsonResponse
     {
         // Get currently authenticated user
-        $user = auth()->user();
+         $user = \Auth::user();
 
         // Extract only fields we want to allow
         $data = $request->only(['f_name', 'l_name', 'email']);
@@ -162,7 +162,7 @@ class UserController extends Controller
         ]);
 
         // Get currently authenticated user
-        $user = auth()->user();
+         $user = \Auth::user();
 
         // Hash the new password
         $user->update([
