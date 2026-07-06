@@ -12,8 +12,6 @@ class PermissionResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            // Laravel automatically sets this from withCount('roles')
-    
         ];
     }
 }
