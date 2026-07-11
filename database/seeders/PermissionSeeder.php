@@ -14,14 +14,14 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         Permission::insert([
-            ['name' => 'View Users'], // Fixed typo: 'Viwe' -> 'View'
-            ['name' => 'Edit Users'],
-            ['name' => 'View Roles'],
-            ['name' => 'Edit Roles'],
-            ['name' => 'View Products'],
-            ['name' => 'Edit Products'],
-            ['name' => 'View Orders'],
-            ['name' => 'Edit Orders'],
+            ['name' => 'view_users'],
+            ['name' => 'edit_users'],
+            ['name' => 'view_roles'],
+            ['name' => 'edit_roles'],
+            ['name' => 'view_products'],
+            ['name' => 'edit_products'],
+            ['name' => 'view_orders'],
+            ['name' => 'edit_orders'],
         ]);
     }
 }
