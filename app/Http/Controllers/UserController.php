@@ -23,6 +23,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
+        \Gate::authorize('view','users');
         $user = User::with('role')->paginate(10);
         return response()->json(UserResources::collection($user), 200);
     }
