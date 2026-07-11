@@ -4,6 +4,10 @@
 
     // use Illuminate\Support\Facades\Gate;
     use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+    use Illuminate\Support\Facades\Gate;
+    use App\Models\User;
+    use Symfony\Component\Routing\Loader\Configurator\Routes;
+use Laravel\Passport\Passport;
 
     class AuthServiceProvider extends ServiceProvider
     {
@@ -18,9 +22,15 @@
 
         /**
          * Register any authentication / authorization services.
-         */
+                */
         public function boot(): void
         {
             $this->registerPolicies();
+
+
+            // PERMISSION CHECK GATE
+            Gate::define('view', function (User $user, $model) {
+                return $user->hasPermission("view_{$model}");
+            });
         }
     }
