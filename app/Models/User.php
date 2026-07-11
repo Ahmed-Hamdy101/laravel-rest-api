@@ -62,11 +62,15 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
-    // permission check 
+    // permission check
+
     public function permissions()
     {
-        return $this->role?->permissions->pluck('name')->toArray() ?? [];
-    } 
+        return $this->role?->permissions->pluck('name') ?? collect();
+    }
 
-    // In User.php
+    public function hasPermission(string $permission): bool
+    {
+        return $this->role ? $this->role->permissions()->where('name', $permission)->exists() : false;
+    }
 }
