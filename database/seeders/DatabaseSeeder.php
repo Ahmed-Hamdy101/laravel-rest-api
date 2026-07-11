@@ -13,11 +13,12 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             // 1. Core independent tables first
-            PermissionSeeder::class, // <-- Must be first!
-            RoleSeeder::class,       // <-- Can now safely look up and bind permissions
+            PermissionSeeder::class,      // <-- Creates all permissions
+            RoleSeeder::class,            // <-- Creates all roles
+            RolePermissionSeeder::class,  // <-- Assigns permissions to roles
             
             // 2. Data dependencies next
-            userSeeder::class,       // <-- Assigns roles to users
+            userSeeder::class,            // <-- Assigns roles to users
             ProductSeeder::class,
             OrderSeeder::class,
         ]);
