@@ -12,20 +12,11 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
 use Illuminate\Support\Facades\Gate;
+use OpenApi\Attributes as OA;
 
-/**
- * @OA\Get(
- *     path="/api/v1/users",
- *     summary="Get users list",
- *     tags={"Users"},
- *     @OA\Response(
- *         response=200,
- *         description="Successful operation",
- *     )
- * )
- */
+
+
 // UserController handles CRUD and profile-related actions for users
 class UserController extends Controller
 {
@@ -33,6 +24,18 @@ class UserController extends Controller
      * Display a paginated list of users.
      * Example: GET /api/v1/users?page=2
      */
+    #[OA\Get(
+        path: "/v1/users",
+        security: [["bearerAuth" => []]],
+        summary: "Get users list",
+        tags: ["Users"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Successful operation",
+            ),
+        ]
+    )]
     public function index(): JsonResponse
     {
        Gate::authorize('view', User::class);
