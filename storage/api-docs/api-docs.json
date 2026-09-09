@@ -12,19 +12,40 @@
         },
         "version": "1.0.0"
     },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api",
+            "description": "Local server"
+        }
+    ],
     "paths": {
-        "/api/v1/users": {
+        "/v1/users": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get users list",
-                "operationId": "f51c3a8f2b2a16539258163e4dde5a37",
+                "description": "Display a paginated list of users.\nExample: GET /api/v1/users?page=2",
+                "operationId": "0e69ec7c952b784b446c59d0dc9955ab",
                 "responses": {
                     "200": {
                         "description": "Successful operation"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },
