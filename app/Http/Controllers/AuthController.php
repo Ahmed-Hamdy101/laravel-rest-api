@@ -15,16 +15,21 @@ class AuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
+        // Validate request
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
         ]);
-
+        
+        // Attempt to login
         if (Auth::attempt($request->only('email', 'password'))) {
+            // Get authenticated user and load role relationship
             $user  = Auth::user()->load('role');
+            // Generate token and set cookie
             $token = $user->createToken('admin')->accessToken;
+            // Set cookie
             $cookie = cookie('jwt', $token, 60 * 24);
-
+            // Return response with token and user data
             return response()->json([
                 'token' => $token,
                 'user'  => [
