@@ -20,3 +20,5 @@ yarn-error.log
 /.idea
 /.vscode
 laravel-rest-api.code-workspace_personal_dev
+
+storage/api-docs/api-docs.json
