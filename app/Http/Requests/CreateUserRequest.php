@@ -3,12 +3,49 @@
 namespace App\Http\Requests;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    title: "Create New User ",
+    description: "Create New Record",
+)]
 class CreateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
+    #[OA\Property(
+        title: "f_name",
+        type: "string"
+    )]
+    public $f_name;
+
+    #[OA\Property(
+        title: "l_name",
+        type: "string"
+    )]
+    public $l_name;
+
+    #[OA\Property(
+        title: "email",
+        type: "string"
+    )]
+    public $email;
+    
+    #[OA\Property(
+        title: "password",
+        type: "string"
+    )]
+
+    public $password;
+    
+    #[OA\Property(
+        title: "role_id",
+        type: "integer"
+    )]
+
+    public $role_id;
+
     public function authorize(): bool
     {
         // req gates for edit  Users
