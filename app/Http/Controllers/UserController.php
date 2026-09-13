@@ -29,6 +29,15 @@ class UserController extends Controller
         security: [["bearerAuth" => []]],
         summary: "Get users list",
         tags: ["Users"],
+        parameters: [
+            new OA\Parameter(
+                name: "page",
+                description: "Page number",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -36,6 +45,7 @@ class UserController extends Controller
             ),
         ]
     )]
+
     public function index(): JsonResponse
     {
        Gate::authorize('view', User::class);
@@ -52,7 +62,34 @@ class UserController extends Controller
      * Show a single user by ID.
      * Example: GET /api/v1/users/5
      */
-    public function show( int $id): JsonResponse
+
+    #[OA\Get(
+        path: "/v1/users/{id}",
+        summary: "Show a single user by ID",
+        security: [["bearerAuth" => []]],
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                description: "The unique identifier of the user",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "User details retrieved successfully"
+            ),
+            new OA\Response(
+                response: 404,
+                description: "User not found"
+            )
+        ]
+    )]
+
+     public function show( int $id): JsonResponse
     {
         // define who can access to it 
          Gate::authorize('view', User::class);
@@ -68,16 +105,38 @@ class UserController extends Controller
         return response()->json(new UserResources($user), 200);
     }
 
+
+
     /**
      * Create a new user.
-     * Example: POST /api/v1/users
-     * Body: { "f_name": "...", "l_name": "...", "email": "...", "password": "..." }
+     * Example: GET /api/v1/users/
      */
+
+    #[OA\Post(
+        path: "/v1/users/",
+        summary: "Create a new user",
+        tags: ["Users"],
+        security: [["bearerAuth" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                ref : '#/components/schemas/CreateUserRequest'
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "User created successfully"
+            ),
+        ]
+    )]
+
+
     public function store(CreateUserRequest $request): JsonResponse
     {
            Gate::authorize('edit', User::class);
         // Get only allowed fields from request
-        $data = $request->only(['f_name', 'l_name', 'email','role_id']);
+        $data = $request->only(['f_name', 'l_name', 'email','password','role_id']);
 
         // Hash password before saving (security!)
         $data['password'] = Hash::make($request->input('password'));
@@ -93,6 +152,35 @@ class UserController extends Controller
      * Update an existing user by ID.
      * Example: PUT /api/users/5
      */
+
+    #[OA\Put(
+        path: "/v1/users/{id}",
+        summary: "Update a current user",
+        security: [["bearerAuth" => []]],
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                description: "The unique identifier of the user",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                ref : '#/components/schemas/UpdateUserRequest'
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 202,
+                description: "User Updated successfully"
+            ),
+        ]
+    )]
+
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
         // define who can access to it Admin | Editor
@@ -124,6 +212,33 @@ class UserController extends Controller
      * Delete a user by ID.
      * Example: DELETE /api/users/5
      */
+
+        #[OA\Delete(
+        path: "/v1/users/{id}",
+        summary: "Delete a single user by ID",
+        security: [["bearerAuth" => []]],
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                description: "The unique identifier of the user",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "User Deleted successfully"
+            ),
+            new OA\Response(
+                response: 404,
+                description: "User not found"
+            )
+        ]
+    )]
+
     public function destroy( int $id): JsonResponse
     {
         // define who can access to it Admin | Editor
