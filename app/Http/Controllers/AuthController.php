@@ -10,9 +10,30 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Role;
+use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
 {
+    /** Authenticate a user and issue an access token. */
+    #[OA\Post(
+        path: '/v1/login',
+        summary: 'Log in a user',
+        tags: ['Authentication'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'password'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email'),
+                    new OA\Property(property: 'password', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Login successful'),
+            new OA\Response(response: 401, description: 'Invalid credentials'),
+        ]
+    )]
     public function login(Request $request): JsonResponse
     {
         // Validate request
@@ -47,6 +68,29 @@ class AuthController extends Controller
         );
     }
 
+    /** Register a new user and issue an access token. */
+    #[OA\Post(
+        path: '/v1/register',
+        summary: 'Register a user',
+        tags: ['Authentication'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['f_name', 'l_name', 'email', 'password', 'password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'f_name', type: 'string'),
+                    new OA\Property(property: 'l_name', type: 'string'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email'),
+                    new OA\Property(property: 'password', type: 'string', format: 'password'),
+                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'User registered successfully'),
+            new OA\Response(response: 422, description: 'Validation failed'),
+        ]
+    )]
     public function register(RegisterRequest $request): JsonResponse
     {
         $data = $request->only(['f_name', 'l_name', 'email']);
@@ -71,6 +115,16 @@ class AuthController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+    /** Revoke the current session cookie. */
+    #[OA\Post(
+        path: '/v1/logout',
+        summary: 'Log out the current user',
+        security: [['bearerAuth' => []]],
+        tags: ['Authentication'],
+        responses: [
+            new OA\Response(response: 200, description: 'Logout successful'),
+        ]
+    )]
     public function logout(): JsonResponse
     {
         $cookie = \Cookie::forget('jwt');
