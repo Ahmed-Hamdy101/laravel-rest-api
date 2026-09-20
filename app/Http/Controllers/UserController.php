@@ -259,9 +259,26 @@ class UserController extends Controller
     }
 
     /**
+     * Get currently authenticated user
      * Example: GET /api/user (with token)
      */
-     // Get currently authenticated user
+    #[OA\Get(
+        path:"/v1/profile",
+        summary:"Get currently authenticated user",
+        security:[["bearerAuth"=>[]]],
+        tags:["User Profile"],
+        responses:[
+            new OA\Response(
+                response:200,
+                description:"User details retrieved successfully"
+            ),
+            new OA\Response(
+                response:404,
+                description:"User not found"
+            )
+        ]
+        )
+    ]
         public function user(): JsonResponse
             {
                 $user = \Auth::user();
@@ -273,11 +290,37 @@ class UserController extends Controller
                     ]
                 ])->response();
             }
+
+
+    /**
+     *  SWagger Docs
+     * Example: PUT /api/user/info
+     */
+        #[OA\Put(
+        path: "/v1/profile/info",
+        summary: "Update a current user",
+        security: [["bearerAuth" => []]],
+        tags:["User Profile"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                ref : '#/components/schemas/ProfileUpdateRequest'
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 202,
+                description: "User Updated successfully"
+            ),
+        ]
+    )]
+
     /**
      * Update logged-in user’s profile info.
      * Example: PUT /api/user/info
      */
-    public function updateInfo(UpdateUserRequest $request) // 2. Type-hint it here
+
+    public function updateInfo(UpdateUserRequest $request)
     {
         // 3. Obtain ONLY the validated fields
         $validated = $request->validated();
@@ -291,10 +334,35 @@ class UserController extends Controller
         ], 202);
     }
 
+
+    /**
+     *  SWagger Docs
+     * Example: PUT /api/user/info
+     */
+        #[OA\Put(
+        path: "/v1/profile/password",
+        summary: "Update passwordd current user",
+        security: [["bearerAuth" => []]],
+        tags:["User Profile"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                ref : '#/components/schemas/ProfileUpdatePassword'
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 202,
+                description: "User Passsword Updated successfully"
+            ),
+        ]
+    )]
+
     /**
      * Update logged-in user’s password.
      * Example: PUT /api/user/password
      */
+    
     public function updatePassword(Request $request): JsonResponse
     {
         // Validate the new password
