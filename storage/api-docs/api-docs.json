@@ -19,6 +19,136 @@
         }
     ],
     "paths": {
+        "/v1/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get products list",
+                "operationId": "34ee6e9e8fa0c95d9bd89cfc374a81e2",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "path",
+                        "description": "Page number",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Retrieve All Products successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Create a new product",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "ef2288e0d31fb52d40e1ad1fd5e1ef8b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product created successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/proudcts/{id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Show a single product by ID",
+                "description": "Display single Prodcut.",
+                "operationId": "0367d22c4d372e6a2a2a17e977f3c9cd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": " The Unique identifier of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "interger"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Retrieve One Single Product successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/products/{id}": {
+            "put": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Update a product",
+                "description": "Update the specified resource in storage.",
+                "operationId": "8774040d41d2ccb9b1710aee2adedbbf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The unique identifier of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/v1/users": {
             "get": {
                 "tags": [
@@ -216,6 +346,57 @@
                 },
                 "type": "object"
             },
+            "ProductCreateRequest": {
+                "title": "Product",
+                "description": "Product model",
+                "properties": {
+                    "title": {
+                        "title": "title",
+                        "description": "Determine if the user is authorized to make this request.",
+                        "type": "string"
+                    },
+                    "description": {
+                        "title": "description",
+                        "type": "string"
+                    },
+                    "image": {
+                        "title": "image",
+                        "type": "string"
+                    },
+                    "price": {
+                        "title": "price",
+                        "type": "number",
+                        "format": "float",
+                        "minimum": 0
+                    }
+                },
+                "type": "object"
+            },
+            "ProductUpdateRequest": {
+                "title": "Product",
+                "description": "Product model update request",
+                "properties": {
+                    "title": {
+                        "title": "title",
+                        "type": "string"
+                    },
+                    "description": {
+                        "title": "description",
+                        "type": "string"
+                    },
+                    "image": {
+                        "title": "image",
+                        "type": "string"
+                    },
+                    "price": {
+                        "title": "price",
+                        "type": "number",
+                        "format": "float",
+                        "minimum": 0
+                    }
+                },
+                "type": "object"
+            },
             "UpdateUserRequest": {
                 "title": "Update User Request",
                 "description": "Request body for updating a user",
@@ -262,6 +443,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Products",
+            "description": "Products"
+        },
         {
             "name": "Users",
             "description": "Users"
