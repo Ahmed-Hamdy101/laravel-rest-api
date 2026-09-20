@@ -158,10 +158,26 @@ class ProductController extends Controller
         ); 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-
+    /** Delete a product by ID. */
+    #[OA\Delete(
+        path: '/v1/products/{id}',
+        summary: 'Delete a product',
+        security: [['bearerAuth' => []]],
+        tags: ['Products'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'The unique identifier of the product',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Product deleted successfully'),
+            new OA\Response(response: 404, description: 'Product not found')
+        ]
+    )]
     public function destroy(string $id)
     {
         //  req gates for delete  Products
