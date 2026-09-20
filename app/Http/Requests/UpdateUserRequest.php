@@ -17,37 +17,37 @@ class UpdateUserRequest extends FormRequest
      * Determine if the user is authorized to make this request.
      */
         #[OA\Property(type: 'string')]
-        public $f_name;
+        public string $f_name;
 
         #[OA\Property(type: 'string')]
-        public $l_name;
+        public string $l_name;
 
         #[OA\Property(type: 'string', format: 'email')]
-        public $email;
+        public string $email;
 
         #[OA\Property(
             type: 'string',
             format: 'password',
             writeOnly: true
         )]
-        public $current_password;
+        public string $current_password;
 
         #[OA\Property(
             type: 'string',
             format: 'password',
             writeOnly: true
         )]
-        public $password;
+        public string $password;
 
         #[OA\Property(
             type: 'string',
             format: 'password',
             writeOnly: true
         )]
-        public $password_confirmation;
+        public string $password_confirmation;
 
         #[OA\Property(type: 'integer')]
-        public $role_id;
+        public int $role_id;
 
     public function authorize(): bool
     {
