@@ -9,6 +9,7 @@ use OpenApi\Attributes as OA;
     title: "Create New User ",
     description: "Create New Record",
 )]
+
 class CreateUserRequest extends FormRequest
 {
     /**
@@ -18,33 +19,33 @@ class CreateUserRequest extends FormRequest
         title: "f_name",
         type: "string"
     )]
-    public $f_name;
+    public string $f_name;
 
     #[OA\Property(
         title: "l_name",
         type: "string"
     )]
-    public $l_name;
+    public  string $l_name;
 
     #[OA\Property(
         title: "email",
         type: "string"
     )]
-    public $email;
+    public  string $email;
     
     #[OA\Property(
         title: "password",
         type: "string"
     )]
 
-    public $password;
+    public string $password;
     
     #[OA\Property(
         title: "role_id",
         type: "integer"
     )]
 
-    public $role_id;
+    public int $role_id;
 
     public function authorize(): bool
     {
