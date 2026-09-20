@@ -7,9 +7,18 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use phpDocumentor\Reflection\Types\Collection;
 use Illuminate\Support\Facades\Gate;
+use OpenApi\Attributes as OA;
 
 class OrderController extends Controller
 {
+    /** List the authenticated user's orders with their items. */
+    #[OA\Get(
+        path: '/v1/orders',
+        summary: 'List orders',
+        security: [['bearerAuth' => []]],
+        tags: ['Orders'],
+        responses: [new OA\Response(response: 200, description: 'Orders retrieved successfully')]
+    )]
     public function index()
     {
         // req gates for view  Orders
@@ -18,6 +27,18 @@ class OrderController extends Controller
         return OrderResource::collection($order);
     }
 
+    /** Show one order and its items by ID. */
+    #[OA\Get(
+        path: '/v1/orders/{id}',
+        summary: 'Show an order',
+        security: [['bearerAuth' => []]],
+        tags: ['Orders'],
+        parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Order retrieved successfully'),
+            new OA\Response(response: 404, description: 'Order not found'),
+        ]
+    )]
     public function show($id)
     {
         // req gates for view  one single order
@@ -26,7 +47,14 @@ class OrderController extends Controller
         return new OrderResource(Order::findOrFail($id));
     }
 
-    // create function export to download file order
+    /** Export all orders as a CSV file. */
+    #[OA\Get(
+        path: '/v1/orders/export',
+        summary: 'Export orders',
+        security: [['bearerAuth' => []]],
+        tags: ['Orders'],
+        responses: [new OA\Response(response: 200, description: 'CSV export generated successfully')]
+    )]
     public function export()
     {
              Gate::authorize('view', Order::class);
